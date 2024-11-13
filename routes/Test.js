@@ -1,8 +1,15 @@
 const express = require('express');
+const pool = require('../config/db');
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    res.send('Hello Test !!!')
+    try {
+        const result = await pool.query('SELECT * FROM answers');
+        res.json(result.rows);
+    }catch(err){
+        res.status(500).json({error: 'Erreur lors de la récupération des réponses'});
+    }
 });
 
 module.exports = router;
