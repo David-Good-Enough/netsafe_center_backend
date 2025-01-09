@@ -66,7 +66,7 @@ router.post('/logout', (req, res) => {
 // ✅ Fonctions de génération de tokens
 function generateAccessToken(user) {
     return jwt.sign(
-        { userId: user.id, username: user.identifiant }, 
+        { userId: user.id, username: user.mail }, 
         process.env.JWT_SECRET, 
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
     );
@@ -74,7 +74,7 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
     return jwt.sign(
-        { userId: user.id, username: user.identifiant }, 
+        { userId: user.id, username: user.mail }, 
         process.env.REFRESH_TOKEN_SECRET, 
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
     );
