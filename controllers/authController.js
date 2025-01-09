@@ -39,6 +39,37 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// 📥 Inscription utilisateur avec hachage du mot de passe
+router.post('/register', async (req, res) => {
+    const { identifiant, mail, password, photo } = req.body;
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE identifiant = $1', [identifiant]);
+
+        if (result.rows.length > 0) {
+            return res.status(400).json({ success: false, message: 'Identifiant déjà utilisé.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const insertResult = await pool.query(
+            `INSERT INTO users (identifiant, mail, password, photo, last_login) 
+             VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING *`,
+            [identifiant, mail, hashedPassword, photo]
+        );
+
+        const token = jwt.sign(
+            { userId: insertResult.rows[0].id, username: identifiant },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(201).json({ success: true, user: insertResult.rows[0], token });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: 'Erreur lors de l’inscription.' });
+    }
+});
+
 // 📥 Rafraîchir le token d'accès
 router.post('/refresh', (req, res) => {
     const { token } = req.body;
