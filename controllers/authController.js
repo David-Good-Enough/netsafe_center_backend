@@ -13,7 +13,7 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE identifiant = $1', [username]);
+        const result = await pool.query('SELECT * FROM users WHERE mail = $1', [username]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
