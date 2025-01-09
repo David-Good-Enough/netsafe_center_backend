@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// Middleware pour vérifier le token JWT
+// Vérification de l'access token
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization');
-
     if (!token) {
         return res.status(403).json({ success: false, message: 'Accès non autorisé. Token manquant.' });
     }
