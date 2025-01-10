@@ -8,7 +8,7 @@ const router = express.Router();
 
 let refreshTokens = []; // Stocker les refresh tokens temporairement (préférer une DB)
 
-// 📥 Connexion utilisateur
+// ✅ Connexion utilisateur avec récupération des variables d'environnement
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -26,46 +26,88 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Mot de passe incorrect.' });
         }
 
-        // Générer les tokens
-        const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
+        // ✅ Utilisation correcte des variables d'environnement
+        const accessToken = jwt.sign(
+            { userId: user.id, username: user.identifiant },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
+        );
+
+        const refreshToken = jwt.sign(
+            { userId: user.id, username: user.identifiant },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
+        );
 
         // Stocker le refresh token
         refreshTokens.push(refreshToken);
 
-        res.json({ success: true, accessToken, refreshToken });
+        // ✅ Envoyer l'expiration correctement
+        res.json({
+            success: true,
+            accessToken,
+            refreshToken,
+            accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
+            refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION
+        });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ success: false, message: 'Erreur serveur.' });
     }
 });
 
-// 📥 Inscription utilisateur avec hachage du mot de passe
+// 📥 Inscription utilisateur avec hachage du mot de passe et génération de tokens
 router.post('/register', async (req, res) => {
     const { identifiant, mail, password, photo } = req.body;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE identifiant = $1', [identifiant]);
+        // ✅ Vérifier si l'utilisateur existe déjà
+        const existingUser = await pool.query('SELECT * FROM users WHERE identifiant = $1', [identifiant]);
 
-        if (result.rows.length > 0) {
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ success: false, message: 'Identifiant déjà utilisé.' });
         }
 
+        // ✅ Hachage du mot de passe
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // ✅ Insérer l'utilisateur dans la base de données
         const insertResult = await pool.query(
             `INSERT INTO users (identifiant, mail, password, photo, last_login) 
              VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING *`,
             [identifiant, mail, hashedPassword, photo]
         );
 
-        const token = jwt.sign(
-            { userId: insertResult.rows[0].id, username: identifiant },
+        const user = insertResult.rows[0];
+
+        // ✅ Générer les tokens avec les durées depuis .env
+        const accessToken = jwt.sign(
+            { userId: user.id, username: user.identifiant },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION } // Utilisation de l'expiration définie dans le .env
         );
 
-        res.status(201).json({ success: true, user: insertResult.rows[0], token });
+        const refreshToken = jwt.sign(
+            { userId: user.id, username: user.identifiant },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
+        );
+
+        // ✅ Stocker temporairement le refresh token (à stocker en BDD dans un projet réel)
+        refreshTokens.push(refreshToken);
+
+        // ✅ Réponse avec les tokens et durées d'expiration
+        res.status(201).json({
+            success: true,
+            user,
+            accessToken,
+            refreshToken,
+            accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
+            refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION
+        });
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ success: false, message: 'Erreur lors de l’inscription.' });
     }
 });
