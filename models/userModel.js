@@ -1,5 +1,5 @@
 const pool = require('../db'); // Connexion à la base PostgreSQL
-const bcrypt = require('bcrypt'); // Pour le hachage des mots de passe
+const bcrypt = require('bcryptjs'); // Pour le hachage des mots de passe
 const jwt = require('jsonwebtoken'); // Pour la gestion des tokens JWT
 require('dotenv').config();
 
