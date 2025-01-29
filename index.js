@@ -50,3 +50,5 @@ app.get('/protected', (req, res) => {
 app.listen(port, () => {
     console.log(`✅ Serveur sécurisé actif sur http://localhost:${port}`);
 });
+
+module.exports = app;
