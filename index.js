@@ -47,8 +47,8 @@ app.get('/protected', (req, res) => {
 });
 
 // ✅ Démarrage du serveur
-app.listen(port, () => {
-    console.log(`✅ Serveur sécurisé actif sur http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`✅ Serveur sécurisé actif sur http://localhost:${port}`);
+// });
 
 module.exports = app;
