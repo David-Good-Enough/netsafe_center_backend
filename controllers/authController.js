@@ -28,13 +28,13 @@ router.post('/login', async (req, res) => {
 
         // ✅ Utilisation correcte des variables d'environnement
         const accessToken = jwt.sign(
-            { userId: user.id, mail: user.identifiant },
+            { userId: user.id, mail: user.mail },
             process.env.JWT_SECRET,
             { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
         );
 
         const refreshToken = jwt.sign(
-            { userId: user.id, mail: user.identifiant },
+            { userId: user.id, mail: user.mail },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
         );
