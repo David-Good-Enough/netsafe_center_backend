@@ -2,6 +2,21 @@ const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
 
+
+router.get('/search', async (req, res) => {
+    const { query } = req.query;
+    if (!query) {
+        return res.status(400).json({ error: 'Veuillez fournir un critère de recherche via le paramètre "query".' });
+    }
+    try {
+        // Assurez-vous d'avoir une méthode searchUsers dans userModel qui prend en paramètre le critère de recherche.
+        const users = await userModel.searchUsers(query);
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la recherche des utilisateurs' });
+    }
+});
+
 // 📥 GET : Récupérer tous les utilisateurs
 router.get('/', async (req, res) => {
     try {
@@ -66,5 +81,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
     }
 });
+
+
 
 module.exports = router;
