@@ -25,13 +25,13 @@ app.use(express.json());
 
 // ✅ Routes publiques (accessibles sans token)
 app.use('/Login', authController); // Connexion & Inscription
-app.post('/users', usersController); // Créer un utilisateur (inscription)
+app.post('/users/register', usersController); // Création d'un utilisateur (inscription)
 
 // ✅ Middleware global : protège toutes les routes suivantes
 app.use(authenticateToken); 
 
 // ✅ Routes protégées (nécessitent un token valide)
-app.use('/users', usersController);  // Accès aux utilisateurs
+app.use('/users', usersController);  // Gestion des utilisateurs (ex : GET /users pour récupérer les données)
 app.use('/quizzes', quizController);
 app.use('/posts', postsController);
 app.use('/comments', commentsController);
