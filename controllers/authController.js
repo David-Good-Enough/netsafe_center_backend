@@ -10,10 +10,10 @@ let refreshTokens = []; // Stocker les refresh tokens temporairement (préférer
 
 // ✅ Connexion utilisateur avec récupération des variables d'environnement
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { mail, password } = req.body;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE mail = $1', [username]);
+        const result = await pool.query('SELECT * FROM users WHERE mail = $1', [mail]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
@@ -28,13 +28,13 @@ router.post('/login', async (req, res) => {
 
         // ✅ Utilisation correcte des variables d'environnement
         const accessToken = jwt.sign(
-            { userId: user.id, username: user.identifiant },
+            { userId: user.id, mail: user.identifiant },
             process.env.JWT_SECRET,
             { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
         );
 
         const refreshToken = jwt.sign(
-            { userId: user.id, username: user.identifiant },
+            { userId: user.id, mail: user.identifiant },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
         );
@@ -82,13 +82,13 @@ router.post('/register', async (req, res) => {
 
         // ✅ Générer les tokens avec les durées depuis .env
         const accessToken = jwt.sign(
-            { userId: user.id, username: user.identifiant },
+            { userId: user.id, mail: user.identifiant },
             process.env.JWT_SECRET,
             { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION } // Utilisation de l'expiration définie dans le .env
         );
 
         const refreshToken = jwt.sign(
-            { userId: user.id, username: user.identifiant },
+            { userId: user.id, mail: user.identifiant },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
         );
@@ -139,7 +139,7 @@ router.post('/logout', (req, res) => {
 // ✅ Fonctions de génération de tokens
 function generateAccessToken(user) {
     return jwt.sign(
-        { userId: user.id, username: user.mail }, 
+        { userId: user.id, mail: user.mail }, 
         process.env.JWT_SECRET, 
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
     );
@@ -147,7 +147,7 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
     return jwt.sign(
-        { userId: user.id, username: user.mail }, 
+        { userId: user.id, mail: user.mail }, 
         process.env.REFRESH_TOKEN_SECRET, 
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
     );
