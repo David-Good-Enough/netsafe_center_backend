@@ -70,7 +70,7 @@ const deleteUser = async (id) => {
 // sheach user
 const searchUsers = async (query) => {
     // Utilisation de ILIKE pour une recherche insensible à la casse
-    const sql = `SELECT * FROM users WHERE identifiant ILIKE $1`;
+    const sql = `SELECT identifiant, mail, photo FROM users WHERE identifiant ILIKE $1`;
     const result = await pool.query(sql, [`%${query}%`]);
     return result.rows;
 }

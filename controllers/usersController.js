@@ -9,9 +9,8 @@ router.get('/search', async (req, res) => {
         return res.status(400).json({ error: 'Veuillez fournir un critère de recherche via le paramètre "query".' });
     }
     try {
-        // Assurez-vous d'avoir une méthode searchUsers dans userModel qui prend en paramètre le critère de recherche.
         const users = await userModel.searchUsers(query);
-        res.json(users);
+        res.json(users);    
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la recherche des utilisateurs' });
     }
