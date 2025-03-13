@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Mot de passe incorrect.' });
         }
 
-        // ✅ Utilisation correcte des variables d'environnement
+        // ✅ Génération des tokens
         const accessToken = jwt.sign(
             { userId: user.id, mail: user.mail },
             process.env.JWT_SECRET,
@@ -42,19 +42,21 @@ router.post('/login', async (req, res) => {
         // Stocker le refresh token
         refreshTokens.push(refreshToken);
 
-        // ✅ Envoyer l'expiration correctement
+        // ✅ Renvoyer la réponse avec les tokens et l'identifiant de l'utilisateur
         res.json({
             success: true,
             accessToken,
             refreshToken,
             accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
-            refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION
+            refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION,
+            identifiant: user.identifiant
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Erreur serveur.' });
     }
 });
+
 
 // 📥 Inscription utilisateur avec hachage du mot de passe et génération de tokens
 router.post('/register', async (req, res) => {
