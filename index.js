@@ -43,7 +43,7 @@ app.use('/cours', coursController);
 
 // ✅ Route de test pour vérifier le token
 app.get('/protected', (req, res) => {
-    res.json({ message: `Bienvenue, ${req.user.username}. Vous êtes authentifié.` });
+    res.json({success: true , message: `Bienvenue, ${req.user.username}. Vous êtes authentifié.` });
 });
 
 // ✅ Démarrage du serveur
