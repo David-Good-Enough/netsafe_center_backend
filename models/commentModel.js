@@ -46,7 +46,6 @@ const deleteComment = async (id) => {
 
 module.exports = {
     getAllComments,
-    getCommentById,
     createComment,
     updateComment,
     deleteComment

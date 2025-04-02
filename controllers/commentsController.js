@@ -12,18 +12,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 📥 GET : Récupérer un commentaire par ID
-router.get('/:id', async (req, res) => {
-    try {
-        const comment = await commentModel.getCommentById(req.params.id);
-        if (!comment) {
-            return res.status(404).json({ error: 'Commentaire non trouvé' });
-        }
-        res.json(comment);
-    } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération du commentaire' });
-    }
-});
 
 // 📤 POST : Créer un nouveau commentaire
 router.post('/', async (req, res) => {
