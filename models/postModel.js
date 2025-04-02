@@ -5,12 +5,12 @@ const getAllPosts = async () => {
     const result = await pool.query(`
         SELECT 
             posts.*, 
-            users.name AS user_name, 
+            users.identifiant AS user_name, 
             COUNT(likes.id) AS likes_count
         FROM posts
         JOIN users ON posts.user_id = users.id
         LEFT JOIN likes ON posts.id = likes.post_id
-        GROUP BY posts.id, users.name
+        GROUP BY posts.id, users.identifiant
     `);
     return result.rows;
 };
