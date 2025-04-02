@@ -25,17 +25,17 @@ const getPostById = async (id) => {
 const getCommentsByPost = async (id) => {
     const result = await pool.query(`
         SELECT 
-                comments.*, 
-                users.identifiant AS user_name, 
-                COUNT(likes.id) AS likes_count
-            FROM comments
-            JOIN users ON comments.user_id = users.id
-            LEFT JOIN likes ON comments.id = likes.comment_id
-            WHERE comments.user_id = $1
-            GROUP BY comments.id, users.identifiant
-            ORDER BY comments.created_at
-        `, [id]);
-    return result.rows[0];
+            comments.*, 
+            users.identifiant AS user_name, 
+            COUNT(likes.id) AS likes_count
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN likes ON comments.id = likes.comment_id
+        WHERE comments.post_id = $1
+        GROUP BY comments.id, users.identifiant
+        ORDER BY comments.created_at
+    `, [id]);
+    return result.rows;
 };
 
 // Créer un nouveau post

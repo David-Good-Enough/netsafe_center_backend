@@ -25,16 +25,16 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// 📥 GET : Récupérer les commentaire d'un post
+// 📥 GET : Récupérer les commentaires d'un post
 router.get('/:id/comments', async (req, res) => {
     try {
-        const post = await postModel.getCommentsByPost(req.params.id);
-        if (!post) {
-            return res.status(404).json({ error: 'Post non trouvé' });
+        const comments = await postModel.getCommentsByPost(req.params.id);
+        if (!comments.length) {
+            return res.status(404).json({ error: 'Commentaires non trouvés' });
         }
-        res.json(post);
+        res.json(comments);
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération du post' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des commentaires' });
     }
 });
 
