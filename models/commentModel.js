@@ -15,12 +15,32 @@ const getAllComments = async () => {
     return result.rows;
 };
 
-
+`
+        SELECT 
+            comments.*, 
+            users.identifiant AS user_name, 
+            COUNT(likes.id) AS likes_count
+        FROM comments
+        WHERE id = $1
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN likes ON comments.id = likes.comment_id
+        GROUP BY comments.id, users.identifiant
+    `, [id]
 
 
 // Récupérer un commentaire par ID
 const getCommentById = async (id) => {
-    const result = await pool.query('SELECT * FROM comments WHERE id = $1', [id]);
+    const result = await pool.query(`
+        SELECT 
+            comments.*, 
+            users.identifiant AS user_name, 
+            COUNT(likes.id) AS likes_count
+        FROM comments
+        WHERE id = $1
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN likes ON comments.id = likes.comment_id
+        GROUP BY comments.id, users.identifiant
+    `, [id]);
     return result.rows[0];
 };
 
