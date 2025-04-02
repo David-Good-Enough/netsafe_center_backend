@@ -2,9 +2,21 @@ const pool = require('../db'); // Connexion à la base PostgreSQL
 
 // Récupérer tous les commentaires
 const getAllComments = async () => {
-    const result = await pool.query('SELECT * FROM comments');
+    const result = await pool.query(`
+        SELECT 
+            comments.*, 
+            users.identifiant AS user_name, 
+            COUNT(likes.id) AS likes_count
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN likes ON comments.id = likes.comment_id
+        GROUP BY comments.id, users.identifiant
+    `);
     return result.rows;
 };
+
+
+
 
 // Récupérer un commentaire par ID
 const getCommentById = async (id) => {
