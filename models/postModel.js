@@ -2,7 +2,7 @@ const pool = require('../db'); // Connexion à PostgreSQL
 
 // Récupérer tous les posts
 const getAllPosts = async () => {
-    const result = await pool.query('SELECT * FROM posts JOIN users ON posts.user_id = users.id');
+    const result = await pool.query('SELECT * FROM posts Join likes on posts.user_id = like.user_id JOIN users ON posts.user_id = users.id');
     return result.rows;
 };
 
