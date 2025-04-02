@@ -15,23 +15,6 @@ const getAllComments = async () => {
     return result.rows;
 };
 
-
-// Récupérer un commentaire par ID
-const getCommentById = async (id) => {
-    const result = await pool.query(`
-        SELECT 
-            comments.*, 
-            users.identifiant AS user_name, 
-            COUNT(likes.id) AS likes_count
-        FROM comments
-        JOIN users ON comments.user_id = users.id
-        LEFT JOIN likes ON comments.id = likes.comment_id
-        WHERE comments.id = $1
-        GROUP BY comments.id, users.identifiant
-    `, [id]);
-    return result.rows[0];
-};
-
 // Créer un nouveau commentaire
 const createComment = async (content, user_id, post_id) => {
     const result = await pool.query(

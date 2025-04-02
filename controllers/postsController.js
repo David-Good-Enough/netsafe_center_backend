@@ -25,6 +25,20 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// 📥 GET : Récupérer les commentaire d'un post
+router.get('/:id/comments', async (req, res) => {
+    try {
+        const post = await postModel.getCommentsByPost(req.params.id);
+        if (!post) {
+            return res.status(404).json({ error: 'Post non trouvé' });
+        }
+        res.json(post);
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la récupération du post' });
+    }
+});
+
+
 // 📤 POST : Créer un nouveau post
 router.post('/', async (req, res) => {
     const { title, content, user_id } = req.body;

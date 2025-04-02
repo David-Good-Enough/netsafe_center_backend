@@ -21,6 +21,23 @@ const getPostById = async (id) => {
     return result.rows[0];
 };
 
+// Récupérer les commentaires d'un post
+const getCommentsByPost = async (id) => {
+    const result = await pool.query(`
+        SELECT 
+                comments.*, 
+                users.identifiant AS user_name, 
+                COUNT(likes.id) AS likes_count
+            FROM comments
+            JOIN users ON comments.user_id = users.id
+            LEFT JOIN likes ON comments.id = likes.comment_id
+            WHERE comments.user_id = $1
+            GROUP BY comments.id, users.identifiant
+            ORDER BY comments.created_at
+        `, [id]);
+    return result.rows[0];
+};
+
 // Créer un nouveau post
 const createPost = async (title, content, user_id) => {
     const result = await pool.query(
@@ -48,6 +65,7 @@ const deletePost = async (id) => {
 module.exports = {
     getAllPosts,
     getPostById,
+    getCommentsByPost,
     createPost,
     updatePost,
     deletePost
