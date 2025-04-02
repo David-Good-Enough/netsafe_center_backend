@@ -24,9 +24,9 @@ const getCommentById = async (id) => {
             users.identifiant AS user_name, 
             COUNT(likes.id) AS likes_count
         FROM comments
-        WHERE id = $1
         JOIN users ON comments.user_id = users.id
         LEFT JOIN likes ON comments.id = likes.comment_id
+        WHERE comments.id = $1
         GROUP BY comments.id, users.identifiant
     `, [id]);
     return result.rows[0];
