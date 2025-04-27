@@ -13,6 +13,7 @@ const answersController = require('./controllers/answersController');
 const likesController = require('./controllers/likesController');
 const contenuCoursController = require('./controllers/contenuCoursController');
 const coursController = require('./controllers/coursController');
+const postsControllerPrivate = require('./controllers/postsControllerPrivate');
 
 // Importation du middleware JWT
 const authenticateToken = require('./middlewares/authMiddleware');
@@ -25,7 +26,6 @@ app.use(express.json());
 
 // ✅ Routes publiques (accessibles sans token)
 app.use('/Login', authController); // Connexion & Inscription
-app.post('/users/register', usersController); // Création d'un utilisateur (inscription)
 app.use('/posts', postsController);
 
 // ✅ Middleware global : protège toutes les routes suivantes
@@ -40,6 +40,7 @@ app.use('/answers', answersController);
 app.use('/likes', likesController);
 app.use('/contenu_cours', contenuCoursController);
 app.use('/cours', coursController);
+app.use('/posts', postsControllerPrivate);
 
 // ✅ Route de test pour vérifier le token
 app.get('/protected', (req, res) => {

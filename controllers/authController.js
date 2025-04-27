@@ -13,18 +13,29 @@ router.post('/login', async (req, res) => {
     const { mail, password } = req.body;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE mail = $1', [mail]);
+        // 1️⃣ Première requête : récupérer seulement le mot de passe
+        const passwordResult = await pool.query('SELECT password FROM users WHERE mail = $1', [mail]);
 
-        if (result.rows.length === 0) {
+        if (passwordResult.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
         }
 
-        const user = result.rows[0];
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const hashedPassword = passwordResult.rows[0].password;
+
+        // Comparer les mots de passe
+        const isValidPassword = await bcrypt.compare(password, hashedPassword);
 
         if (!isValidPassword) {
             return res.status(401).json({ success: false, message: 'Mot de passe incorrect.' });
         }
+
+        // 2️⃣ Deuxième requête : récupérer les infos utilisateur sans password et last_login
+        const userResult = await pool.query(
+            'SELECT id, identifiant, mail, photo FROM users WHERE mail = $1',
+            [mail]
+        );
+
+        const user = userResult.rows[0];
 
         // ✅ Génération des tokens
         const accessToken = jwt.sign(
@@ -42,14 +53,14 @@ router.post('/login', async (req, res) => {
         // Stocker le refresh token
         refreshTokens.push(refreshToken);
 
-        // ✅ Renvoyer la réponse avec les tokens et l'identifiant de l'utilisateur
+        // ✅ Renvoyer l'utilisateur sans password ni last_login
         res.json({
             success: true,
             accessToken,
             refreshToken,
             accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
             refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION,
-            identifiant: user.identifiant
+            user: user
         });
     } catch (error) {
         console.error(error);
