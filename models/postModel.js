@@ -11,7 +11,7 @@ const getAllPosts = async () => {
         FROM posts
         JOIN users ON posts.user_id = users.id
         LEFT JOIN likes ON posts.id = likes.post_id
-        GROUP BY posts.id, users
+        GROUP BY posts.id, users.identifiant, users.photo
     `);
     return result.rows;
 };
