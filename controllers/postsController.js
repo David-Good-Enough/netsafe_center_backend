@@ -5,9 +5,23 @@ const postModel = require('../models/postModel');
 // 📥 GET : Récupérer tous les posts
 router.get('/', async (req, res) => {
     try {
-        const posts = await postModel.getAllPosts();
+        const rawPosts = await postModel.getAllPosts();
+
+        const posts = rawPosts.map(post => {
+            const { identifiant, photo, ...postWithoutUserFields } = post;
+
+            return {
+                ...postWithoutUserFields,
+                user: {
+                    identifiant,
+                    photo
+                }
+            };
+        });
+
         res.json(posts);
     } catch (error) {
+        console.error('Erreur dans GET /posts:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
     }
 });
