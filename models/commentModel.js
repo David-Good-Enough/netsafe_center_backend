@@ -18,9 +18,8 @@ const getAllComments = async () => {
 // Créer un nouveau commentaire
 const createComment = async (content, user_id, post_id) => {
     const result = await pool.query(
-        `INSERT INTO comments (content, user_id, post_id, created_at) 
-        VALUES ($1, $2, $3, CURRENT_TIMESTAMP) 
-        RETURNING *`,
+        `INSERT INTO comments (content, user_id, post_id, created_at)
+         VALUES ($1, $2, $3, NOW()) RETURNING *`,
         [content, user_id, post_id]
     );
     return result.rows[0];

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postModel = require('../models/postModel');
+const createComment = require('../models/commentModel');
 
 // 📤 POST : Créer un nouveau post
 router.post('/', async (req, res) => {
@@ -50,6 +51,24 @@ router.delete('/:id', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erreur lors de la suppression du post.' });
+    }
+});
+
+// créer un commentaire dans un post
+router.post('/:postId/comments', async (req, res) => {
+    const { content, user_id } = req.body;
+    const { postId } = req.params;
+
+    if (!content || !user_id) {
+        return res.status(400).json({ error: 'Contenu et user_id requis.' });
+    }
+
+    try {
+        const newComment = await commentModel.createComment(content, user_id, postId);
+        res.status(201).json(newComment);
+    } catch (error) {
+        console.error('Erreur création commentaire:', error);
+        res.status(500).json({ error: 'Erreur lors de la création du commentaire.' });
     }
 });
 
