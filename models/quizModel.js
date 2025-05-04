@@ -54,7 +54,7 @@ const checkQuizCompletion = async (userId, quizTitle) => {
                 THEN true ELSE false 
             END AS is_completed
         FROM quizzes q
-        JOIN questions quest ON quest.quize_id = q.id
+        JOIN questions quest ON quest.quizze_id = q.id
         LEFT JOIN answers a ON a.question_id = quest.id AND a.user_id = $1
         WHERE q.title = $2
         GROUP BY q.id, q.title;
