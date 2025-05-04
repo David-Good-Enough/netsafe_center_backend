@@ -72,7 +72,7 @@ router.get('/:title/completed/:user_id', async (req, res) => {
     const { title, user_id } = req.params;
 
     try {
-        const status = await quizModel.isQuizCompletedByUser(user_id, title);
+        const status = await quizModel.checkQuizCompletion(user_id, title);
 
         if (!status) {
             return res.status(404).json({ error: 'Quiz non trouvé ou aucune question associée.' });
