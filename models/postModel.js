@@ -1,4 +1,4 @@
-const pool = require('../db'); // Connexion à PostgreSQL
+const pool = require('../db');
 
 // Récupérer tous les posts
 const getAllPosts = async () => {
@@ -15,27 +15,10 @@ const getAllPosts = async () => {
     return result.rows;
 };
 
-// Récupérer un post par son ID
+// Récupérer un post par ID
 const getPostById = async (id) => {
     const result = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
     return result.rows[0];
-};
-
-// Récupérer les commentaires d'un post
-const getCommentsByPost = async (id) => {
-    const result = await pool.query(`
-        SELECT 
-            comments.*, 
-            users.identifiant AS user_name, 
-            COUNT(likes.id) AS likes_count
-        FROM comments
-        JOIN users ON comments.user_id = users.id
-        LEFT JOIN likes ON comments.id = likes.comment_id
-        WHERE comments.post_id = $1
-        GROUP BY comments.id, users.identifiant
-        ORDER BY comments.created_at
-    `, [id]);
-    return result.rows;
 };
 
 // Créer un nouveau post
@@ -65,7 +48,6 @@ const deletePost = async (id) => {
 module.exports = {
     getAllPosts,
     getPostById,
-    getCommentsByPost,
     createPost,
     updatePost,
     deletePost

@@ -2,45 +2,54 @@ const express = require('express');
 const router = express.Router();
 const postModel = require('../models/postModel');
 
-// 📤 POST : Créer une nouvelle question
+// 📤 POST : Créer un nouveau post
 router.post('/', async (req, res) => {
-    const { title, content, sequence, quiz_id, cours_id, user_id } = req.body;
-    if (!title || !content || !sequence || !quiz_id || !cours_id || !user_id) {
-        return res.status(400).json({ error: 'Tous les champs sont requis.' });
+    const { title, content, user_id } = req.body;
+
+    if (!title || !content || !user_id) {
+        return res.status(400).json({ error: 'Les champs title, content et user_id sont requis.' });
     }
 
     try {
-        const newQuestion = await questionModel.createQuestion(title, content, sequence, quiz_id, cours_id, user_id);
-        res.status(201).json(newQuestion);
+        const newPost = await postModel.createPost(title, content, user_id);
+        res.status(201).json(newPost);
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la création de la question.' });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la création du post.' });
     }
 });
 
-// 🛠️ PUT : Mettre à jour une question
+// 🛠️ PUT : Mettre à jour un post
 router.put('/:id', async (req, res) => {
-    const { title, content, sequence, quiz_id, cours_id, user_id } = req.body;
+    const { title, content } = req.body;
+
+    if (!title || !content) {
+        return res.status(400).json({ error: 'Les champs title et content sont requis.' });
+    }
+
     try {
-        const updatedQuestion = await questionModel.updateQuestion(req.params.id, title, content, sequence, quiz_id, cours_id, user_id);
-        if (!updatedQuestion) {
-            return res.status(404).json({ error: 'Question non trouvée.' });
+        const updatedPost = await postModel.updatePost(req.params.id, title, content);
+        if (!updatedPost) {
+            return res.status(404).json({ error: 'Post non trouvé.' });
         }
-        res.json(updatedQuestion);
+        res.json(updatedPost);
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la mise à jour de la question.' });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du post.' });
     }
 });
 
-// 🗑️ DELETE : Supprimer une question
+// 🗑️ DELETE : Supprimer un post
 router.delete('/:id', async (req, res) => {
     try {
-        const deletedQuestion = await questionModel.deleteQuestion(req.params.id);
-        if (!deletedQuestion) {
-            return res.status(404).json({ error: 'Question non trouvée.' });
+        const deletedPost = await postModel.deletePost(req.params.id);
+        if (!deletedPost) {
+            return res.status(404).json({ error: 'Post non trouvé.' });
         }
-        res.json({ message: 'Question supprimée avec succès.' });
+        res.json({ message: 'Post supprimé avec succès.' });
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la suppression de la question.' });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du post.' });
     }
 });
 
