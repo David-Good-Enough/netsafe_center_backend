@@ -67,4 +67,22 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// ✅ GET : Vérifier si un utilisateur a terminé un quiz par son nom
+router.get('/:title/completed/:user_id', async (req, res) => {
+    const { title, user_id } = req.params;
+
+    try {
+        const status = await quizModel.isQuizCompletedByUser(user_id, title);
+
+        if (!status) {
+            return res.status(404).json({ error: 'Quiz non trouvé ou aucune question associée.' });
+        }
+
+        res.json(status);
+    } catch (error) {
+        console.error('Erreur quizController:', error);
+        res.status(500).json({ error: 'Erreur lors de la vérification du quiz.' });
+    }
+});
+
 module.exports = router;

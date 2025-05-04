@@ -41,10 +41,35 @@ const deleteQuiz = async (id) => {
     return result.rows[0];
 };
 
+// Chequer si utilisateur a fait quizz
+const checkQuizCompletion = async (userId, quizTitle) => {
+    const result = await pool.query(`
+        SELECT
+            q.id AS quiz_id,
+            q.title AS quiz_title,
+            COUNT(DISTINCT quest.id) AS total_questions,
+            COUNT(DISTINCT a.question_id) AS user_answers,
+            CASE 
+                WHEN COUNT(DISTINCT quest.id) = COUNT(DISTINCT a.question_id) 
+                THEN true ELSE false 
+            END AS is_completed
+        FROM quizzes q
+        JOIN questions quest ON quest.quize_id = q.id
+        LEFT JOIN answers a ON a.question_id = quest.id AND a.user_id = $1
+        WHERE q.title = $2
+        GROUP BY q.id, q.title;
+    `, [userId, quizTitle]);
+
+    return result.rows[0]; // ou [] si pas trouvé
+};
+
+
+
 module.exports = {
     getAllQuizzes,
     getQuizById,
     createQuiz,
     updateQuiz,
-    deleteQuiz
+    deleteQuiz,
+    checkQuizCompletion
 };
