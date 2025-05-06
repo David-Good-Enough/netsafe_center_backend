@@ -83,7 +83,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ✅ GET : Tous les posts d’un utilisateur
-router.get('/users/:id/posts', async (req, res) => {
+router.get('/:id/posts', async (req, res) => {
     const { id } = req.params;
 
     try {
