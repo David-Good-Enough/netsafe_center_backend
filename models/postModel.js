@@ -79,6 +79,7 @@ const getPostsByUserId = async (userId) => {
     return result.rows;
 };
 
+
 module.exports = {
     getAllPosts,
     getPostById,

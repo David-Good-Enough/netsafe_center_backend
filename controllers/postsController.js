@@ -49,7 +49,7 @@ router.get('/:id/comments', async (req, res) => {
 
 // ✅ GET : tous les commentaires d’un post avec pagination + tri
 router.get('/:postId/comments', async (req, res) => {
-    const { postId } = req.params;
+    const postId = parseInt(req.params.postId);
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.start) || 0;
     const sortBy = req.query.sortBy || 'created_at';
