@@ -1,7 +1,14 @@
 const pool = require('../db');
 
 // Récupérer tous les posts
-const getAllPosts = async (limit = 10, offset = 0) => {
+const getAllPosts = async (limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'DESC') => {
+    const allowedSortFields = ['created_at', 'likes_count', 'title'];
+    const allowedSortOrder = ['ASC', 'DESC'];
+
+    // Sécurité : éviter les injections SQL
+    if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
+    if (!allowedSortOrder.includes(sortOrder.toUpperCase())) sortOrder = 'DESC';
+
     const result = await pool.query(`
         SELECT 
             posts.*, 
@@ -14,12 +21,13 @@ const getAllPosts = async (limit = 10, offset = 0) => {
         JOIN users ON posts.user_id = users.id
         LEFT JOIN likes ON posts.id = likes.post_id
         GROUP BY posts.id, users.identifiant, users.photo
-        ORDER BY posts.created_at DESC
+        ORDER BY ${sortBy} ${sortOrder}
         LIMIT $1 OFFSET $2
     `, [limit, offset]);
 
     return result.rows;
 };
+
 // Récupérer un post par ID
 const getPostById = async (id) => {
     const result = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);

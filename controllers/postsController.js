@@ -6,25 +6,15 @@ const postModel = require('../models/postModel');
 router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const start = parseInt(req.query.start) || 0;
+    const sortBy = req.query.sortBy || 'created_at'; // ou 'likes_count'
+    const sortOrder = req.query.sortOrder || 'DESC'; // ou 'ASC'
 
     try {
-        const rawPosts = await postModel.getAllPosts(limit, start);
-
-        const posts = rawPosts.map(post => {
-            const { identifiant, photo, ...rest } = post;
-            return {
-                ...rest,
-                user: {
-                    identifiant,
-                    photo
-                }
-            };
-        });
-
+        const posts = await postModel.getAllPosts(limit, start, sortBy, sortOrder);
         res.json(posts);
     } catch (error) {
-        console.error('Erreur getAllPosts :', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des posts.' });
+        console.error('Erreur récupération posts avec tri :', error);
+        res.status(500).json({ error: 'Erreur serveur.' });
     }
 });
 
