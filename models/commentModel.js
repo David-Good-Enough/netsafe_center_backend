@@ -51,6 +51,13 @@ const getCommentsByPost = async (postId, limit = 10, offset = 0, sortBy = 'creat
     if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
     if (!allowedSortOrder.includes(sortOrder.toUpperCase())) sortOrder = 'ASC';
 
+    let orderClause;
+    if (sortBy === 'likes_count') {
+        orderClause = `ORDER BY COUNT(likes.id) ${sortOrder}`;
+    } else {
+        orderClause = `ORDER BY ${sortBy} ${sortOrder}`;
+    }
+
     const result = await pool.query(`
         SELECT 
             comments.*,
@@ -64,12 +71,13 @@ const getCommentsByPost = async (postId, limit = 10, offset = 0, sortBy = 'creat
         LEFT JOIN likes ON comments.id = likes.comment_id
         WHERE comments.post_id = $1
         GROUP BY comments.id, users.identifiant, users.photo
-        ORDER BY ${sortBy} ${sortOrder}
+        ${orderClause}
         LIMIT $2 OFFSET $3
     `, [postId, limit, offset]);
 
     return result.rows;
 };
+
 
 
 
