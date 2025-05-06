@@ -34,18 +34,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// 📥 GET : Récupérer les commentaires d'un post
-router.get('/:id/comments', async (req, res) => {
-    try {
-        const comments = await postModel.getCommentsByPost(req.params.id);
-        if (!comments.length) {
-            return res.status(404).json({ error: 'Commentaires non trouvés' });
-        }
-        res.json(comments);
-    } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération des commentaires' });
-    }
-});
 
 // ✅ GET : tous les commentaires d’un post avec pagination + tri
 router.get('/:postId/comments', async (req, res) => {
