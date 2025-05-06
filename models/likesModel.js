@@ -12,13 +12,12 @@ const getLikeById = async (id) => {
     return result.rows[0];
 };
 
-// Créer un nouveau like
-const createLike = async (liked, comment_id, user_id, post_id) => {
+const createLike = async (liked, user_id, post_id = null, comment_id = null) => {
     const result = await pool.query(
-        `INSERT INTO likes (liked, comment_id, user_id, post_id, created_at) 
-        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) 
-        RETURNING *`,
-        [liked, comment_id, user_id, post_id]
+        `INSERT INTO likes (liked, user_id, post_id, comment_id, created_at) 
+         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) 
+         RETURNING *`,
+        [liked, user_id, post_id, comment_id]
     );
     return result.rows[0];
 };

@@ -32,7 +32,7 @@ app.use('/posts', postsController);
 app.use(authenticateToken); 
 
 // ✅ Routes protégées (nécessitent un token valide)
-app.use('/users', usersController);  // Gestion des utilisateurs (ex : GET /users pour récupérer les données)
+app.use('/users', usersController); 
 app.use('/quizzes', quizController);
 app.use('/comments', commentsController);
 app.use('/questions', questionsController);

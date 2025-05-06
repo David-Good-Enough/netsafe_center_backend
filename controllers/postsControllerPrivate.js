@@ -72,4 +72,22 @@ router.post('/:postId/comments', async (req, res) => {
     }
 });
 
+// ✅ Like un post
+router.post('/:postId/like', async (req, res) => {
+    const { liked, user_id } = req.body;
+    const postId = req.params.postId;
+
+    if (liked === undefined || !user_id) {
+        return res.status(400).json({ error: 'Champs liked et user_id requis.' });
+    }
+
+    try {
+        const like = await likeModel.createLike(liked, user_id, postId, null);
+        res.status(201).json(like);
+    } catch (error) {
+        console.error('Erreur like post :', error);
+        res.status(500).json({ error: 'Erreur lors du like du post.' });
+    }
+});
+
 module.exports = router;

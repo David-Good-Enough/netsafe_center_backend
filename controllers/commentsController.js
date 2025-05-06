@@ -13,21 +13,6 @@ router.get('/', async (req, res) => {
 });
 
 
-// 📤 POST : Créer un nouveau commentaire
-router.post('/', async (req, res) => {
-    const { content, user_id, post_id } = req.body;
-    if (!content || !user_id || !post_id) {
-        return res.status(400).json({ error: 'Tous les champs sont requis' });
-    }
-
-    try {
-        const newComment = await commentModel.createComment(content, user_id, post_id);
-        res.status(201).json(newComment);
-    } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la création du commentaire' });
-    }
-});
-
 // 🛠️ PUT : Mettre à jour un commentaire
 router.put('/:id', async (req, res) => {
     const { content } = req.body;
@@ -52,6 +37,24 @@ router.delete('/:id', async (req, res) => {
         res.json({ message: 'Commentaire supprimé avec succès' });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la suppression du commentaire' });
+    }
+});
+
+// ✅ Like un commentaire
+router.post('/:commentId/like', async (req, res) => {
+    const { liked, user_id } = req.body;
+    const commentId = req.params.commentId;
+
+    if (liked === undefined || !user_id) {
+        return res.status(400).json({ error: 'Champs liked et user_id requis.' });
+    }
+
+    try {
+        const like = await likeModel.createLike(liked, user_id, null, commentId);
+        res.status(201).json(like);
+    } catch (error) {
+        console.error('Erreur like commentaire :', error);
+        res.status(500).json({ error: 'Erreur lors du like du commentaire.' });
     }
 });
 
