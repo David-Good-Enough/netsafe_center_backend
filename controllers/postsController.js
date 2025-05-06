@@ -4,14 +4,16 @@ const postModel = require('../models/postModel');
 
 // 📥 GET : Récupérer tous les posts
 router.get('/', async (req, res) => {
+    const limit = parseInt(req.query.limit) || 10;
+    const start = parseInt(req.query.start) || 0;
+
     try {
-        const rawPosts = await postModel.getAllPosts();
+        const rawPosts = await postModel.getAllPosts(limit, start);
 
         const posts = rawPosts.map(post => {
-            const { identifiant, photo, ...postWithoutUserFields } = post;
-
+            const { identifiant, photo, ...rest } = post;
             return {
-                ...postWithoutUserFields,
+                ...rest,
                 user: {
                     identifiant,
                     photo
@@ -21,10 +23,11 @@ router.get('/', async (req, res) => {
 
         res.json(posts);
     } catch (error) {
-        console.error('Erreur dans GET /posts:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
+        console.error('Erreur getAllPosts :', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des posts.' });
     }
 });
+
 
 // 📥 GET : Récupérer un post par ID
 router.get('/:id', async (req, res) => {

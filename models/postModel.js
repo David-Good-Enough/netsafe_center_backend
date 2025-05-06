@@ -1,21 +1,25 @@
 const pool = require('../db');
 
 // Récupérer tous les posts
-const getAllPosts = async () => {
+const getAllPosts = async (limit = 10, offset = 0) => {
     const result = await pool.query(`
         SELECT 
             posts.*, 
-            users.identifiant, 
-            users.photo, 
+            json_build_object(
+                'identifiant', users.identifiant,
+                'photo', users.photo
+            ) AS user,
             COUNT(likes.id) AS likes_count
         FROM posts
         JOIN users ON posts.user_id = users.id
         LEFT JOIN likes ON posts.id = likes.post_id
         GROUP BY posts.id, users.identifiant, users.photo
-    `);
+        ORDER BY posts.created_at DESC
+        LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+
     return result.rows;
 };
-
 // Récupérer un post par ID
 const getPostById = async (id) => {
     const result = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
