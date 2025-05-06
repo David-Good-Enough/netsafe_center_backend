@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const postModel = require('../models/postModel');
+const commentModel = require('../models/commentModel');
+
 
 // 📥 GET : Récupérer tous les posts
 router.get('/', async (req, res) => {
@@ -42,6 +44,23 @@ router.get('/:id/comments', async (req, res) => {
         res.json(comments);
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des commentaires' });
+    }
+});
+
+// ✅ GET : tous les commentaires d’un post avec pagination + tri
+router.get('/:postId/comments', async (req, res) => {
+    const { postId } = req.params;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.start) || 0;
+    const sortBy = req.query.sortBy || 'created_at';
+    const sortOrder = req.query.sortOrder || 'ASC';
+
+    try {
+        const comments = await commentModel.getCommentsByPost(postId, limit, offset, sortBy, sortOrder);
+        res.json(comments);
+    } catch (error) {
+        console.error('Erreur récupération commentaires :', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des commentaires.' });
     }
 });
 

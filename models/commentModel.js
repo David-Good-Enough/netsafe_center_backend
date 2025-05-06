@@ -43,9 +43,40 @@ const deleteComment = async (id) => {
     return result.rows[0];
 };
 
+// Récupérer les commentaire d'un post pour tri et limit
+const getCommentsByPost = async (postId, limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'ASC') => {
+    const allowedSortFields = ['created_at', 'likes_count'];
+    const allowedSortOrder = ['ASC', 'DESC'];
+
+    if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
+    if (!allowedSortOrder.includes(sortOrder.toUpperCase())) sortOrder = 'ASC';
+
+    const result = await pool.query(`
+        SELECT 
+            comments.*,
+            json_build_object(
+                'identifiant', users.identifiant,
+                'photo', users.photo
+            ) AS user,
+            COUNT(likes.id) AS likes_count
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN likes ON comments.id = likes.comment_id
+        WHERE comments.post_id = $1
+        GROUP BY comments.id, users.identifiant, users.photo
+        ORDER BY ${sortBy} ${sortOrder}
+        LIMIT $2 OFFSET $3
+    `, [postId, limit, offset]);
+
+    return result.rows;
+};
+
+
+
 module.exports = {
     getAllComments,
     createComment,
     updateComment,
-    deleteComment
+    deleteComment,
+    getCommentsByPost
 };
