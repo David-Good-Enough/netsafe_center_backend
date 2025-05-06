@@ -46,10 +46,32 @@ const deletePost = async (id) => {
     return result.rows[0];
 };
 
+// Récupérer posts par utilisateur
+const getPostsByUserId = async (userId) => {
+    const result = await pool.query(`
+        SELECT 
+            posts.*, 
+            json_build_object(
+                'identifiant', users.identifiant,
+                'photo', users.photo
+            ) AS user,
+            COUNT(likes.id) AS likes_count
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        LEFT JOIN likes ON posts.id = likes.post_id
+        WHERE posts.user_id = $1
+        GROUP BY posts.id, users.identifiant, users.photo
+        ORDER BY posts.created_at DESC
+    `, [userId]);
+
+    return result.rows;
+};
+
 module.exports = {
     getAllPosts,
     getPostById,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    getPostsByUserId
 };

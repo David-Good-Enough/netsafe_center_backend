@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
+const postModel = require('../models/postModel')
 
 
 router.get('/search', async (req, res) => {
@@ -78,6 +79,24 @@ router.delete('/:id', async (req, res) => {
         res.json({ message: 'Utilisateur supprimé avec succès' });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
+    }
+});
+
+// ✅ GET : Tous les posts d’un utilisateur
+router.get('/users/:id/posts', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const posts = await postModel.getPostsByUserId(id);
+        
+        if (posts.length === 0) {
+            return res.status(404).json({ message: "Aucun post trouvé pour cet utilisateur." });
+        }
+
+        res.json(posts);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des posts de l’utilisateur:', error);
+        res.status(500).json({ error: 'Erreur serveur.' });
     }
 });
 
