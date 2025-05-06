@@ -60,6 +60,8 @@ router.post('/:postId/comments', async (req, res) => {
     const { content, user_id } = req.body;
     const { postId } = req.params;
 
+    console.log("passage dans route privée")
+
     if (!content || !user_id) {
         return res.status(400).json({ error: 'Contenu et user_id requis.' });
     }
