@@ -40,7 +40,7 @@ app.use('/answers', answersController);
 app.use('/likes', likesController);
 app.use('/contenu_cours', contenuCoursController);
 app.use('/cours', coursController);
-app.use('/posts', postsControllerPrivate);
+app.use('/private/posts', postsControllerPrivate);
 
 // ✅ Route de test pour vérifier le token
 app.get('/protected', (req, res) => {
