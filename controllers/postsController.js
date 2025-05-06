@@ -55,6 +55,8 @@ router.get('/:postId/comments', async (req, res) => {
     const sortBy = req.query.sortBy || 'created_at';
     const sortOrder = req.query.sortOrder || 'ASC';
 
+    console.log("passage dans route public")
+
     try {
         const comments = await commentModel.getCommentsByPost(postId, limit, offset, sortBy, sortOrder);
         res.json(comments);
