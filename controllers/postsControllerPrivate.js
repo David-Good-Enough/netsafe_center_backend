@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postModel = require('../models/postModel');
 const commentModel = require('../models/commentModel');
-const likeModel = require('../models/likeModel');
+const likeModel = require('../models/likesModel');
 
 // 📤 POST : Créer un nouveau post
 router.post('/', async (req, res) => {

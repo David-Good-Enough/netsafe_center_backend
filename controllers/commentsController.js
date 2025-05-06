@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const commentModel = require('../models/commentModel');
-const likeModel = require('../models/likeModel');
+const likeModel = require('../models/likesModel');
 
 // 📥 GET : Récupérer tous les commentaires
 router.get('/', async (req, res) => {
