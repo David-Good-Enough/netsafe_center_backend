@@ -6,7 +6,7 @@ const commentModel = require('../models/commentModel');
 
 // 📥 GET : Récupérer tous les posts
 router.get('/', async (req, res) => {
-    const limit = parseInt(req.query.limit) || 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
     const start = parseInt(req.query.start) || 0;
     const sortBy = req.query.sortBy || 'created_at'; // ou 'likes_count'
     const sortOrder = req.query.sortOrder || 'DESC'; // ou 'ASC'
