@@ -133,7 +133,7 @@ router.delete('/:userId/favorites/:postId', async (req, res) => {
 });
 
 // GET Posts liké par le user
-router.get('/:userId/Posts-likes', async (req, res) => {
+router.get('/:userId/posts-likes', async (req, res) => {
     try {
       const userId = parseInt(req.params.userId, 10);
       
