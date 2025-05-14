@@ -139,7 +139,7 @@ router.get('/:userId/Posts-likes', async (req, res) => {
       
   
       const likedIds = await likeModel.getLikedPostIdsByUser(userId);
-      res.json({ like: likedIds });
+      res.json({ likes: likedIds });
     } catch (err) {
       console.error('Error fetching liked post IDs:', err);
       res.status(500).json({ error: 'Server error' });
@@ -148,12 +148,11 @@ router.get('/:userId/Posts-likes', async (req, res) => {
 
 
 // GET Comments liké par le user
-router.get('/:userId/comment-likes', async (req, res) => {
+router.get('/:userId/comments-likes', async (req, res) => {
     try {
       const userId = parseInt(req.params.userId, 10);
-      // (optionnel) vérifier que req.user.userId === userId si auth
       const commentIds = await likeModel.getLikedCommentIdsByUser(userId);
-      res.json({ like: commentIds });
+      res.json({ likes: commentIds });
     } catch (err) {
       console.error('Error fetching liked comment IDs:', err);
       res.status(500).json({ error: 'Server error' });
