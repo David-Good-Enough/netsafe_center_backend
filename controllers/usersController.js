@@ -131,4 +131,33 @@ router.delete('/:userId/favorites/:postId', async (req, res) => {
     }
 });
 
+// GET Posts liké par le user
+router.get('/:userId/likes', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId, 10);
+      
+  
+      const likedIds = await likeModel.getLikedPostIdsByUser(userId);
+      res.json({ like: likedIds });
+    } catch (err) {
+      console.error('Error fetching liked post IDs:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+// GET Comments liké par le user
+router.get('/:userId/comment-likes', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId, 10);
+      // (optionnel) vérifier que req.user.userId === userId si auth
+      const commentIds = await likeModel.getLikedCommentIdsByUser(userId);
+      res.json({ like: commentIds });
+    } catch (err) {
+      console.error('Error fetching liked comment IDs:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+
 module.exports = router;

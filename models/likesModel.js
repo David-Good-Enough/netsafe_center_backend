@@ -43,10 +43,42 @@ const deleteCommentLike = async (user_id, comment_id) => {
   return result.rows[0];
 };
 
+// récupérer like de Posts par users
+const getLikedPostIdsByUser = async (userId) => {
+    const result = await pool.query(
+      `SELECT post_id
+       FROM like_posts
+       WHERE user_id = $1
+         AND liked = true
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+  
+    // Ne renvoyer que les valeurs post_id
+    return result.rows.map(row => row.post_id);
+};
+
+// récupérer like de Comment par users
+const getLikedcommentIdsByUser = async (userId) => {
+    const result = await pool.query(
+      `SELECT comment_id
+       FROM like_comments
+       WHERE user_id = $1
+         AND liked = true
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+  
+    // Ne renvoyer que les valeurs comment_id
+    return result.rows.map(row => row.comment_id);
+};
+
 module.exports = {
   createPostLike,
   deletePostLike,
   createCommentLike,
   deleteCommentLike,
-  
+  getLikedPostIdsByUser,
+  getLikedcommentIdsByUser
+
 };
