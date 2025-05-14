@@ -44,22 +44,25 @@ const createUser = async (identifiant, mail, password, photo) => {
 };
 
 // Mettre à jour un utilisateur avec hachage conditionnel
-const updateUser = async (id, identifiant, mail, password, photo) => {
-    try {
-        const hashedPassword = password ? await bcrypt.hash(password, SALT_ROUNDS) : undefined;
-
-        const result = await pool.query(
-            `UPDATE users 
-             SET identifiant = $1, mail = $2, password = COALESCE($3, password), photo = $4, last_login = CURRENT_TIMESTAMP 
-             WHERE id = $5 RETURNING *`,
-            [identifiant, mail, hashedPassword, photo, id]
-        );
-
-        return result.rows[0];
-    } catch (error) {
-        throw new Error('Erreur lors de la mise à jour de l’utilisateur.');
-    }
-};
+const updateUserPartial = async (id, fields) => {
+    // Génère dynamiquement les clauses SET et les paramètres
+    const keys   = Object.keys(fields);
+    const sets   = keys.map((key, idx) => `${key} = $${idx + 1}`);
+    const values = keys.map(key => fields[key]);
+  
+    // Ajoute l'ID comme dernier paramètre
+    values.push(id);
+  
+    const sql = `
+      UPDATE users
+      SET ${sets.join(', ')}
+      WHERE id = $${values.length}
+      RETURNING id, identifiant, mail, photo, last_login
+    `;
+  
+    const result = await pool.query(sql, values);
+    return result.rows[0];
+  };
 
 // Supprimer un utilisateur
 const deleteUser = async (id) => {
@@ -79,7 +82,7 @@ module.exports = {
     getAllUsers,
     getUserById,
     createUser,
-    updateUser,
+    updateUserPartial,
     deleteUser,
     searchUsers
 };

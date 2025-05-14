@@ -57,19 +57,37 @@ router.post('/', async (req, res) => {
     }
 });
 
-// 🛠️ PUT : Mettre à jour un utilisateur
-router.put('/:id', async (req, res) => {
+// 🛠️ PATCH : Mettre à jour partiellement un utilisateur
+router.patch('/:id', async (req, res) => {
+    const userId = parseInt(req.params.id, 10);
     const { identifiant, mail, password, photo } = req.body;
-    try {
-        const updatedUser = await userModel.updateUser(req.params.id, identifiant, mail, password, photo);
-        if (!updatedUser) {
-            return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        }
-        res.json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
+  
+    // Construire dynamiquement l'objet des champs à mettre à jour
+    const fields = {};
+    if (identifiant !== undefined) fields.identifiant = identifiant;
+    if (mail        !== undefined) fields.mail        = mail;
+    if (password    !== undefined) fields.password    = password;
+    if (photo       !== undefined) fields.photo       = photo;
+  
+    // Si aucun champ n'est fourni
+    if (Object.keys(fields).length === 0) {
+      return res.status(400).json({ error: 'Au moins un champ à mettre à jour est requis.' });
     }
-});
+  
+    try {
+      // userModel.updateUserPartial doit accepter un objet fields
+      const updatedUser = await userModel.updateUserPartial(userId, fields);
+  
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+      }
+  
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour partielle de l’utilisateur :', error);
+      res.status(500).json({ error: 'Erreur serveur.' });
+    }
+  });
 
 // 🗑️ DELETE : Supprimer un utilisateur
 router.delete('/:id', async (req, res) => {
