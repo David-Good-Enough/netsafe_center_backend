@@ -100,6 +100,34 @@ router.get('/:id/posts', async (req, res) => {
     }
 });
 
-
+// GET la liste des favoris d’un utilisateur
+router.get('/:userId/favorites', async (req, res) => {
+    try {
+      const user_id = parseInt(req.params.userId);
+      // Vérifier droits…
+      const list = await favoriteModel.getFavoritesByUser(user_id);
+      res.json({ success: true, favorites: list });
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
+  
+// DELETE un favori pour un post donné
+router.delete('/:userId/favorites/:postId', async (req, res) => {
+    try {
+      const user_id = parseInt(req.params.userId);
+      const post_id = parseInt(req.params.postId);
+      // Vérifier droits…
+      const removed = await favoriteModel.removePostFavorite(user_id, post_id);
+      if (!removed) {
+        return res.status(404).json({ success: false, message: 'Favori non trouvé' });
+      }
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Error removing favorite:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
 
 module.exports = router;
