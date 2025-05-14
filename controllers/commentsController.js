@@ -57,16 +57,26 @@ router.post('/:commentId/like', async (req, res) => {
     }
 });
 
+// DELETE a comment like
 router.delete('/:commentId/like', async (req, res) => {
     const { user_id } = req.body;
     const commentId = parseInt(req.params.commentId);
-    try {
-        const removed = await likeModel.deleteCommentLike(user_id, commentId);
-        res.json(removed);
-    } catch (error) {
-        console.error('Error deleting comment like:', error);
-        res.status(500).json({ error: 'Server error' });
+  
+    if (user_id == null) {
+      return res.status(400).json({ error: 'user_id required' });
     }
-});
-
+  
+    try {
+      const removed = await likeModel.deleteCommentLike(user_id, commentId);
+  
+      if (!removed) {
+        return res.status(404).json({ success: false, message: 'Like non trouvé.' });
+      }
+  
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting comment like:', error);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  });
 module.exports = router;

@@ -90,16 +90,29 @@ router.post('/:postId/like', async (req, res) => {
     }
   });
 
+// DELETE a post like
 router.delete('/:postId/like', async (req, res) => {
-const { user_id } = req.body;
-const postId = parseInt(req.params.postId);
-try {
-    const removed = await likeModel.deletePostLike(user_id, postId);
-    res.json(removed);
-} catch (error) {
-    console.error('Error deleting post like:', error);
-    res.status(500).json({ error: 'Server error' });
-}
-});
+    const { user_id } = req.body;
+    const postId = parseInt(req.params.postId);
+  
+    if (user_id == null) {
+      return res.status(400).json({ error: 'user_id required' });
+    }
+  
+    try {
+      const removed = await likeModel.deletePostLike(user_id, postId);
+  
+      if (!removed) {
+        // aucun like trouvé à supprimer
+        return res.status(404).json({ success: false, message: 'Like non trouvé.' });
+      }
+  
+      // succès
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting post like:', error);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  });
 
 module.exports = router;
