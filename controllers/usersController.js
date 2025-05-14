@@ -3,6 +3,7 @@ const router = express.Router();
 const userModel = require('../models/userModel');
 const postModel = require('../models/postModel')
 const favoriteModel = require('../models/favoriteModel')
+const likeModel = require('../models/likesModel')
 
 
 router.get('/search', async (req, res) => {
