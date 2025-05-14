@@ -43,19 +43,29 @@ router.delete('/:id', async (req, res) => {
 
 // ✅ Like un commentaire
 router.post('/:commentId/like', async (req, res) => {
-    const { liked, user_id } = req.body;
-    const commentId = req.params.commentId;
-
-    if (liked === undefined || !user_id) {
-        return res.status(400).json({ error: 'Champs liked et user_id requis.' });
-    }
-
+    const { user_id, liked } = req.body;
+    const commentId = parseInt(req.params.commentId);
+  
+    if (user_id == null) return res.status(400).json({ error: 'user_id required' });
+  
     try {
-        const like = await likeModel.createLike(liked, user_id, null, commentId);
-        res.status(201).json(like);
+      const like = await likeModel.createCommentLike(user_id, commentId, liked);
+      res.status(201).json(like);
     } catch (error) {
-        console.error('Erreur like commentaire :', error);
-        res.status(500).json({ error: 'Erreur lors du like du commentaire.' });
+      console.error('Error creating comment like:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.delete('/:commentId/like', async (req, res) => {
+    const { user_id } = req.body;
+    const commentId = parseInt(req.params.commentId);
+    try {
+        const removed = await likeModel.deleteCommentLike(user_id, commentId);
+        res.json(removed);
+    } catch (error) {
+        console.error('Error deleting comment like:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

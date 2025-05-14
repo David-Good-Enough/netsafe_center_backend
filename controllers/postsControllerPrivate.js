@@ -76,20 +76,30 @@ router.post('/:postId/comments', async (req, res) => {
 
 // ✅ Like un post
 router.post('/:postId/like', async (req, res) => {
-    const { liked, user_id } = req.body;
-    const postId = req.params.postId;
-
-    if (liked === undefined || !user_id) {
-        return res.status(400).json({ error: 'Champs liked et user_id requis.' });
-    }
-
+    const { user_id, liked } = req.body;
+    const postId = parseInt(req.params.postId);
+  
+    if (user_id == null) return res.status(400).json({ error: 'user_id required' });
+  
     try {
-        const like = await likeModel.createLike(liked, user_id, postId, null);
-        res.status(201).json(like);
+      const like = await likeModel.createPostLike(user_id, postId, liked);
+      res.status(201).json(like);
     } catch (error) {
-        console.error('Erreur like post :', error);
-        res.status(500).json({ error: 'Erreur lors du like du post.' });
+      console.error('Error creating post like:', error);
+      res.status(500).json({ error: 'Server error' });
     }
+  });
+
+router.delete('/:postId/like', async (req, res) => {
+const { user_id } = req.body;
+const postId = parseInt(req.params.postId);
+try {
+    const removed = await likeModel.deletePostLike(user_id, postId);
+    res.json(removed);
+} catch (error) {
+    console.error('Error deleting post like:', error);
+    res.status(500).json({ error: 'Server error' });
+}
 });
 
 module.exports = router;

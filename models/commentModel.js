@@ -44,39 +44,30 @@ const deleteComment = async (id) => {
 };
 
 // Récupérer les commentaire d'un post pour tri et limit
-const getCommentsByPost = async (postId, limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'ASC') => {
-    const allowedSortFields = ['created_at', 'likes_count'];
-    const allowedSortOrder = ['ASC', 'DESC'];
-
-    if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
-    if (!allowedSortOrder.includes(sortOrder.toUpperCase())) sortOrder = 'ASC';
-
-    let orderClause;
-    if (sortBy === 'likes_count') {
-        orderClause = `ORDER BY COUNT(likes.id) ${sortOrder}`;
-    } else {
-        orderClause = `ORDER BY ${sortBy} ${sortOrder}`;
-    }
-
-    const result = await pool.query(`
-        SELECT 
-            comments.*,
-            json_build_object(
-                'identifiant', users.identifiant,
-                'photo', users.photo
-            ) AS user,
-            COUNT(likes.id) AS likes_count
-        FROM comments
-        JOIN users ON comments.user_id = users.id
-        LEFT JOIN likes ON comments.id = likes.comment_id
-        WHERE comments.post_id = $1
-        GROUP BY comments.id, users.identifiant, users.photo
-        ${orderClause}
-        LIMIT $2 OFFSET $3
-    `, [postId, limit, offset]);
-
+const getCommentsByPost = async (postId, limit = null, offset = 0, sortBy = 'created_at', sortOrder = 'ASC') => {
+    const allowed = ['created_at'];
+    if (!allowed.includes(sortBy)) sortBy = 'created_at';
+    sortOrder = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+  
+    const limitClause = limit != null ? 'LIMIT $2 OFFSET $3' : '';
+    const params = limit != null ? [postId, limit, offset] : [postId];
+  
+    const result = await pool.query(
+      `SELECT
+         comments.*,
+         json_build_object('identifiant', users.identifiant, 'photo', users.photo) AS user,
+         COUNT(lc.user_id) AS likes_count
+       FROM comments
+       JOIN users ON comments.user_id = users.id
+       LEFT JOIN like_comments lc ON lc.comment_id = comments.id AND lc.liked = true
+       WHERE comments.post_id = $1
+       GROUP BY comments.id, users.identifiant, users.photo
+       ORDER BY ${sortBy} ${sortOrder}
+       ${limitClause}`,
+      params
+    );
     return result.rows;
-};
+  };
 
 
 

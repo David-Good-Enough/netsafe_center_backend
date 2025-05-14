@@ -1,33 +1,31 @@
 const pool = require('../db');
 
 // Récupérer tous les posts
-const getAllPosts = async (limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'DESC') => {
-    const allowedSortFields = ['created_at', 'likes_count', 'title'];
-    const allowedSortOrder = ['ASC', 'DESC'];
-
-    // Sécurité : éviter les injections SQL
-    if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
-    if (!allowedSortOrder.includes(sortOrder.toUpperCase())) sortOrder = 'DESC';
-
-    const result = await pool.query(`
-        SELECT 
-            posts.*, 
-            json_build_object(
-                'identifiant', users.identifiant,
-                'photo', users.photo
-            ) AS user,
-            COUNT(likes.id) AS likes_count
-        FROM posts
-        JOIN users ON posts.user_id = users.id
-        LEFT JOIN likes ON posts.id = likes.post_id
-        GROUP BY posts.id, users.identifiant, users.photo
-        ORDER BY ${sortBy} ${sortOrder}
-        LIMIT $1 OFFSET $2
-    `, [limit, offset]);
-
+const getAllPosts = async (limit = null, offset = 0, sortBy = 'created_at', sortOrder = 'DESC') => {
+    // ensure valid sort
+    const allowed = ['created_at', 'title'];
+    if (!allowed.includes(sortBy)) sortBy = 'created_at';
+    sortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+  
+    // build query parts
+    const limitClause = limit != null ? 'LIMIT $2 OFFSET $3' : '';
+    const params = limit != null ? [limit, offset] : [];
+  
+    const result = await pool.query(
+      `SELECT
+         posts.*,
+         json_build_object('identifiant', users.identifiant, 'photo', users.photo) AS user,
+         COUNT(lp.user_id) AS likes_count
+       FROM posts
+       JOIN users ON posts.user_id = users.id
+       LEFT JOIN like_posts lp ON lp.post_id = posts.id AND lp.liked = true
+       GROUP BY posts.id, users.identifiant, users.photo
+       ORDER BY ${sortBy} ${sortOrder}
+       ${limitClause}`,
+      params
+    );
     return result.rows;
-};
-
+  };
 // Récupérer un post par ID
 const getPostById = async (id) => {
     const result = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
