@@ -8,7 +8,7 @@ const getAllPosts = async (limit = null, offset = 0, sortBy = 'created_at', sort
     sortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
   
     // build query parts
-    const limitClause = limit != null ? 'LIMIT $2 OFFSET $3' : '';
+    const limitClause = limit != null ? 'LIMIT $1 OFFSET $2' : '';
     const params = limit != null ? [limit, offset] : [];
   
     const result = await pool.query(
