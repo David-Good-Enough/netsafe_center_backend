@@ -54,23 +54,8 @@ router.get('/:postId/comments', async (req, res) => {
     }
 });
 
-// ajouter un favori
-router.post('/:postId/favorite', async (req, res) => {
-    const user_id = parseInt(req.body.user_id);
-    const post_id = parseInt(req.params.postId);
-    if (!user_id) return res.status(400).json({ error: 'user_id required' });
-    try {
-      const fav = await favoriteModel.addPostFavorite(user_id, post_id);
-      if (!fav) {
-        // déjà en favori
-        return res.json({ success: true, message: 'Déjà en favori' });
-      }
-      res.status(201).json({ success: true, favorite: fav });
-    } catch (err) {
-      console.error('Error adding favorite:', err);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
+
+
   
 
 
